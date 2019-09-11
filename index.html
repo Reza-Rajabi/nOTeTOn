@@ -15,9 +15,35 @@
         <br/>
         <br/>
 
-        <form>
+        <div id="note" contenteditable></div>
 
-        </form>
 
     </body>
+    <script src="https://unpkg.com/filer/dist/filer.min.js"></script>
+    <script>
+        const fs = new Filer.FileSystem();
+        window.addEventListener('DOMContentLoaded', (event) => {
+            console.log('DOM fully loaded and parsed');
+        });
+        fs.readFile('/note', 'utf8', function(err, data) {
+            if (err) {
+                console.log("No notes yet!");
+                document.querySelector('#note').innerHTML = "<h5>Delete me and start taking your notes!</h5>";
+            }
+            else {
+                console.log("Read from file: " + data);
+                document.querySelector('#note').innerHTML  = `<h5>${data}</h5>`;
+            }
+        });
+
+        var intervalID = window.setInterval(save, 1000);
+
+        function save() {
+            let data = document.querySelector('#note').innerHTML.toString().trim();
+            fs.writeFile('/note', data, function(err) {
+                console.log("Couldn't Save: " + err);
+            });
+        }
+
+    </script>
 </html>
