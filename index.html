@@ -2,25 +2,97 @@
 
 <html>
     <head>
+
         <meta charset="utf-8">
+        <!-- icon font for responsive menu -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <!-- font -->
+        <link href="https://fonts.googleapis.com/css?family=Indie+Flower&display=swap" rel="stylesheet">
+        <!-- CSS -->
+        <style>
+
+            #note {
+                font-family: 'Indie Flower', cursive;
+                background-color: moccasin;
+                padding: 30px;
+            }
+            .navigationBar {
+                background-color: cadetblue;
+                overflow: hidden;
+            }
+            .navigationBar a {
+                float: left;
+                display: block;
+                color: yellow;
+                text-align: center;
+                padding: 15px 15px;
+                text-decoration: none;
+                font-size: 18px;
+            }
+            .navigationBar a:hover {
+                background-color: paleturquoise;
+                color: darkolivegreen;
+            }
+            .navigationBar .icon {
+                display: none;
+            }
+
+            @media screen and (max-width: 600px) {
+                .navigationBar a:not(:first-child) { display: none; }
+                .navigationBar a.icon {
+                    float: right;
+                    display: block;
+                }
+            }
+
+            @media screen and (max-width: 600px) {
+                .navigationBar.responsive { position: relative; }
+                .navigationBar.responsive a.icon {
+                    position: absolute;
+                    right: 0;
+                    left: 0;
+                }
+                .navigationBar.responsive a {
+                    float: none;
+                    display: block;
+                    text-align: left;
+                }
+            }
+        </style>
+
         <title>nOTeTOn</title>
+
     </head>
 
     <body>
+
         <h1>nOTeTOn</h1>
-        <br/>
 
         <h3>Simply, note down!</h3>
         <br/>
+
+
+        <div class="navigationBar" id="topNav">
+            <a href="" onclick="save()">Save</a>
+            <a href="" onclick="clear()">Clear</a>
+            <a href="javascript:void(0);" class="icon" onclick="makeResponsive()"><i class="fa fa-bars"></i></a>
+        </div>
+
+        <div id="note" contenteditable="true"></div>
         <br/>
         <br/>
-
-        <div id="note" contenteditable></div>
-
+        <br/>
+        <h4>Shortcut: ctrl + x to save.</h4>
 
     </body>
+
+    <!-- using filer to write/read data on client-side storage -->
     <script src="https://unpkg.com/filer/dist/filer.min.js"></script>
-    <script>
+    <!-- using hotkeys to enable shortcut keybords to save data -->
+    <script src="https://unpkg.com/hotkeys-js/dist/hotkeys.min.js"></script>
+
+    <script type="text/javascript">
+
         const fs = new Filer.FileSystem();
         window.addEventListener('DOMContentLoaded', (event) => {
             console.log('DOM fully loaded and parsed');
@@ -28,7 +100,7 @@
         fs.readFile('/note', 'utf8', function(err, data) {
             if (err) {
                 console.log("No notes yet!");
-                document.querySelector('#note').innerHTML = "<h5>Delete me and start taking your notes!</h5>";
+                document.querySelector('#note').innerHTML = "<h5>Click me and start taking your notes!</h5>";
             }
             else {
                 console.log("Read from file: " + data);
@@ -36,14 +108,49 @@
             }
         });
 
-        var intervalID = window.setInterval(save, 1000);
+        //var intervalID = window.setInterval(save, 1000);
+
+        hotkeys.filter = function(event) {
+            var tagName = (event.target || event.srcElement).tagName;
+            return !(tagName.isContentEditable || tagName == 'INPUT' || tagName == 'SELECT' || tagName == 'TEXTAREA');
+        }
+
+        hotkeys('ctrl+x', function(event, handler) {
+           event.preventDefault();
+           save();
+           alert('All Saved!');
+        });
 
         function save() {
             let data = document.querySelector('#note').innerHTML.toString().trim();
             fs.writeFile('/note', data, function(err) {
-                console.log("Couldn't Save: " + err);
+                if (err) {
+                    console.log("Couldn't Save/Nothing Changed: " + err);
+                }
+                else {
+                    console.log("All Saved!");
+                }
             });
         }
 
+        function clear() {
+            console.log("clear called");
+            var nodes = document.getElementById('note').childNodes;
+            for (var i = 0; i < nodes.length; i++) { nodes[i].remove(); }
+            document.querySelector('#note').innerHTML = "";
+            document.getElementById('note').innerText = "";
+            save();
+        }
+
+        function makeResponsive() {
+            var navbar = document.getElementById("topNav");
+            if (navbar.className === "navigationBar") {
+                navbar.className += " responsive";
+            } else {
+                navbar.className = "navigationBar"
+            }
+        }
+
     </script>
+
 </html>
