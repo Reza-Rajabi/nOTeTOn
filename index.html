@@ -122,7 +122,7 @@
         });
 
         function save() {
-            let data = document.querySelector('#note').innerHTML.toString().trim();
+            let data = document.querySelector('#note').innerHTML;
             fs.writeFile('/note', data, function(err) {
                 if (err) {
                     console.log("Couldn't Save/Nothing Changed: " + err);
