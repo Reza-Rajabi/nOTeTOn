@@ -1,129 +1,147 @@
 <!doctype html>
 
 <html>
-    <head>
 
-        <meta charset="utf-8">
-        <!-- icon font for responsive menu -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <!-- font -->
-        <link href="https://fonts.googleapis.com/css?family=Indie+Flower&display=swap" rel="stylesheet">
-        <!-- CSS -->
-        <style>
+<head>
 
-            #note {
-                font-family: 'Indie Flower', cursive;
-                background-color: moccasin;
-                padding: 30px;
-            }
-            .navigationBar {
-                background-color: cadetblue;
-                overflow: hidden;
-            }
-            .navigationBar a {
-                float: left;
-                display: block;
-                color: yellow;
-                text-align: center;
-                padding: 15px 15px;
-                text-decoration: none;
-                font-size: 18px;
-            }
-            .navigationBar a:hover {
-                background-color: paleturquoise;
-                color: darkolivegreen;
-            }
-            .navigationBar .icon {
+    <meta charset="utf-8">
+    <!-- icon font for responsive menu -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- font -->
+    <link href="https://fonts.googleapis.com/css?family=Indie+Flower&display=swap" rel="stylesheet">
+    <!-- CSS -->
+    <style>
+        #note {
+            font-family: 'Indie Flower', cursive;
+            background-color: moccasin;
+            padding: 30px;
+        }
+
+        .navigationBar {
+            background-color: cadetblue;
+            overflow: hidden;
+        }
+
+        .navigationBar a {
+            float: left;
+            display: block;
+            color: yellow;
+            text-align: center;
+            padding: 15px 15px;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        .navigationBar a:hover {
+            background-color: paleturquoise;
+            color: darkolivegreen;
+        }
+
+        .navigationBar .icon {
+            display: none;
+        }
+
+        @media screen and (max-width: 600px) {
+            .navigationBar a:not(:first-child) {
                 display: none;
             }
 
-            @media screen and (max-width: 600px) {
-                .navigationBar a:not(:first-child) { display: none; }
-                .navigationBar a.icon {
-                    float: right;
-                    display: block;
-                }
+            .navigationBar a.icon {
+                float: right;
+                display: block;
+            }
+        }
+
+        @media screen and (max-width: 600px) {
+            .navigationBar.responsive {
+                position: relative;
             }
 
-            @media screen and (max-width: 600px) {
-                .navigationBar.responsive { position: relative; }
-                .navigationBar.responsive a.icon {
-                    position: absolute;
-                    right: 0;
-                    left: 0;
-                }
-                .navigationBar.responsive a {
-                    float: none;
-                    display: block;
-                    text-align: left;
-                }
+            .navigationBar.responsive a.icon {
+                position: absolute;
+                right: 0;
+                left: 0;
             }
-        </style>
 
-        <title>nOTeTOn</title>
+            .navigationBar.responsive a {
+                float: none;
+                display: block;
+                text-align: left;
+            }
+        }
+    </style>
 
-    </head>
+    <title>nOTeTOn</title>
 
-    <body>
+</head>
 
-        <h1>nOTeTOn</h1>
+<body>
 
-        <h3>Simply, note down!</h3>
-        <br/>
+    <h1>nOTeTOn</h1>
+
+    <h3>Simply, note down!</h3>
+    <br />
 
 
-        <div class="navigationBar" id="topNav">
-            <a href="" onclick="save()">Save</a>
-            <a href="" onclick="clear()">Clear</a>
-            <a href="javascript:void(0);" class="icon" onclick="makeResponsive()"><i class="fa fa-bars"></i></a>
-        </div>
+    <div class="navigationBar" id="topNav">
+        <a href="#" onclick="save()">Save</a> <!--If you don't put # in your href, whenever you click the button, it moves to the current, refresh. it cause error-->
+        <a href="#" onclick="load()">Load</a>
+        <a href="#" onclick="clearText()">Clear</a>
+          <a href="javascript:void(0);" class="icon" onclick="makeResponsive()"><i class="fa fa-bars"></i></a>
+    </div>
 
-        <div id="note" contenteditable="true"></div>
-        <br/>
-        <br/>
-        <br/>
-        <h4>Shortcut: ctrl + x to save.</h4>
-
-    </body>
-
+    <div id="note" contenteditable="true">
+        
+    </div>
+    <br />
+    <br />
+    <br />
+    <h4>Shortcut: ctrl + x to save.</h4>
     <!-- using filer to write/read data on client-side storage -->
     <script src="https://unpkg.com/filer/dist/filer.min.js"></script>
     <!-- using hotkeys to enable shortcut keybords to save data -->
     <script src="https://unpkg.com/hotkeys-js/dist/hotkeys.min.js"></script>
-
-    <script type="text/javascript">
+    <script>
 
         const fs = new Filer.FileSystem();
+
         window.addEventListener('DOMContentLoaded', (event) => {
+            event.preventDefault();
             console.log('DOM fully loaded and parsed');
+
         });
-        fs.readFile('/note', 'utf8', function(err, data) {
-            if (err) {
-                console.log("No notes yet!");
-                document.querySelector('#note').innerHTML = "<h5>Click me and start taking your notes!</h5>";
-            }
-            else {
-                console.log("Read from file: " + data);
-                document.querySelector('#note').innerHTML  = `<h5>${data}</h5>`;
-            }
-        });
+
+
+        const load = () => {
+            fs.readFile('/note', 'utf8',  (err, data) => { // this cause error, it should be function, not a default since it works everytime whenver the page refreshed
+                if (err) {
+                    console.log("No notes yet!");
+                    document.querySelector('#note').innerHTML = "Click me and start taking your notes!";
+                }
+                else {
+                    console.log("Read from file: " + data);
+                    document.querySelector('#note').innerHTML = data; // <= And previous inner <h5> tag cause error. it inserted h5 tag agin and again.
+                }
+            });
+        }
 
         //var intervalID = window.setInterval(save, 1000);
-
-        hotkeys.filter = function(event) {
+        
+        hotkeys.filter = function (event) {
             var tagName = (event.target || event.srcElement).tagName;
             return !(tagName.isContentEditable || tagName == 'INPUT' || tagName == 'SELECT' || tagName == 'TEXTAREA');
         }
 
-        hotkeys('ctrl+x', function(event, handler) {
-           event.preventDefault();
-           save();
-           alert('All Saved!');
+        hotkeys('ctrl+x', function (event, handler) {
+            event.preventDefault();
+            save();
+            alert('All Saved!');
         });
 
         function save() {
-            let data = document.querySelector('#note').innerHTML.toString().trim();
-            fs.writeFile('/note', data, function(err) {
+            let data = document.querySelector('#note').innerHTML;
+            console.log(data);
+            fs.writeFile('/note', data, err => {
                 if (err) {
                     console.log("Couldn't Save/Nothing Changed: " + err);
                 }
@@ -133,24 +151,24 @@
             });
         }
 
-        function clear() {
-            console.log("clear called");
-            var nodes = document.getElementById('note').childNodes;
-            for (var i = 0; i < nodes.length; i++) { nodes[i].remove(); }
-            document.querySelector('#note').innerHTML = "";
-            document.getElementById('note').innerText = "";
-            save();
+        const clearText = () => { // I don't know the specific reason, but function name "clear" does not work. After chaning another name, it works. perhaps there are global scope function clear()
+            document.getElementById('note').innerHTML = ""; // And I remove save function after clear since it delete saved data. but you can add it.
         }
-
-        function makeResponsive() {
-            var navbar = document.getElementById("topNav");
-            if (navbar.className === "navigationBar") {
-                navbar.className += " responsive";
-            } else {
-                navbar.className = "navigationBar"
-            }
-        }
-
+/*
+                function makeResponsive() {
+                    var navbar = document.getElementById("topNav");
+                    if (navbar.className === "navigationBar") {
+                        navbar.className += " responsive";
+                    } else {
+                        navbar.className = "navigationBar"
+                    }
+                }
+        */
     </script>
+</body>
+
+
+
+
 
 </html>
